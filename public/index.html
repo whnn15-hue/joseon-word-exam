@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>조선 시대 낱말 쓰기 시험</title>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1ee;--paper:#fff;--ink:#1b2422;--soft:#5d6b67;--line:#d9e0dc;--band:#173b35;--red:#d4372c;--teal:#1d7a6c;--tealbg:#e3f4f0;--redbg:#fdecea}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Gowun Dodum",system-ui,sans-serif}
+h1,h2,.btn,.no{font-family:"Do Hyeon","Gowun Dodum",sans-serif;font-weight:400}
+header{background:var(--band);color:#fff;padding:18px max(5vw,16px) 60px}
+header h1{margin:0;font-size:clamp(26px,5vw,38px);line-height:1.1}
+header p{margin:4px 0 0;opacity:.8;font-size:15px}
+main{max-width:780px;margin:-40px auto 40px;padding:0 12px}
+.card{background:var(--paper);border-radius:18px;padding:clamp(20px,4vw,34px);box-shadow:0 10px 30px rgba(0,0,0,.12);margin-bottom:16px}
+h2{font-size:22px;margin:0 0 12px;color:var(--teal)}
+label.f{display:block;font-size:15px;color:var(--soft);margin:0 0 6px}
+input[type=text]{width:100%;font:inherit;font-size:19px;padding:11px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);min-height:50px}
+input[type=text]:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px var(--tealbg)}
+input.filled{border-color:#9ccfc5}
+.grid{display:grid;grid-template-columns:110px 1fr;gap:12px}
+.btn{border:0;border-radius:12px;padding:12px 24px;font-size:20px;cursor:pointer;min-height:52px;background:var(--teal);color:#fff}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn.ghost{background:none;color:var(--ink);border:2px solid var(--line)}
+.btn:focus-visible{outline:3px solid #e9b949;outline-offset:2px}
+.msg{margin:12px 0 0;color:var(--red);min-height:1.6em}
+.rules{background:var(--tealbg);border-radius:12px;padding:12px 16px;margin:16px 0 0;font-size:15px}
+.rules p{margin:2px 0}
+.sticky{position:sticky;top:0;z-index:5;background:var(--band);color:#fff;padding:10px max(4vw,14px);display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px}
+.sticky b{font-family:"Do Hyeon";font-size:19px;font-weight:400}
+.bar{height:6px;background:rgba(255,255,255,.2)}.bar i{display:block;height:100%;background:#e9b949;transition:width .3s}
+.item{padding:18px 0;border-bottom:1px dashed var(--line)}
+.item:last-child{border-bottom:0}
+.qt{display:flex;gap:10px;margin:0 0 10px}
+.no{flex:none;width:34px;height:34px;border-radius:50%;background:var(--band);color:#fff;display:grid;place-items:center;font-size:17px}
+.blanks{display:grid;gap:8px;padding-left:44px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:10}
+.modal .card{max-width:440px;width:100%;margin:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.big{font-family:"Do Hyeon";font-size:64px;line-height:1;color:var(--red);margin:10px 0}
+[hidden]{display:none!important}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.blanks{padding-left:0}.btn{flex:1 1 auto}}
+</style>
+</head>
+<body>
+<header><h1 id="ttl">조선 시대 낱말 쓰기 시험</h1><p>5학년 사회 | 모든 문제의 답을 직접 써요</p></header>
+
+<main id="intro">
+<section class="card">
+<h2>시험을 시작하기 전에</h2>
+<div class="grid">
+<div><label class="f" for="num">번호</label><input type="text" id="num" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="예: 7"></div>
+<div><label class="f" for="name">이름</label><input type="text" id="name" maxlength="20" autocomplete="off" placeholder="예: 김하늘"></div>
+</div>
+<div class="row"><button class="btn" id="startBtn">시험 시작</button></div>
+<p class="msg" id="introMsg"></p>
+<div class="rules">
+<p>시험은 한 번만 볼 수 있어요.</p>
+<p>힌트는 없어요. 띄어쓰기는 틀려도 괜찮아요.</p>
+<p>모두 쓰고 맨 아래 제출하기를 누르면 끝나요. 제출한 뒤에는 고칠 수 없어요.</p>
+</div>
+</section>
+</main>
+
+<div id="exam" hidden>
+<div class="sticky"><span id="who"></span><b id="cnt"></b></div>
+<div class="bar"><i id="barI" style="width:0"></i></div>
+<main style="margin-top:16px"><div id="paper"></div>
+<section class="card"><p style="margin:0 0 4px">다 썼나요? 빈칸이 없는지 한 번 더 살펴보고 제출해요.</p>
+<div class="row"><button class="btn" id="submitBtn">제출하기</button></div><p class="msg" id="examMsg"></p></section>
+</main>
+</div>
+
+<main id="done" hidden><section class="card" id="doneBox"></section></main>
+
+<div class="modal" id="modal" hidden><div class="card">
+<h2>정말 제출할까요?</h2><p id="modalTxt" style="margin:0"></p>
+<div class="row"><button class="btn ghost" id="backBtn">돌아가서 더 쓰기</button><button class="btn" id="okBtn">제출하기</button></div>
+</div></div>
+
+<script>
+{
+let DATA = null;
+const KEY = 'joseon-exam-v1';
+const $ = id => document.getElementById(id);
+const store = { get(){ try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } },
+  set(v){ try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
+let me = null;
+
+async function post(url, body) {
+  const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  return r.json();
+}
+
+$('startBtn').disabled = true;
+$('introMsg').textContent = '시험지를 불러오고 있어요...';
+fetch('/api/exam', { cache: 'no-store' }).then(r => r.json()).then(d => {
+  DATA = d;
+  $('ttl').textContent = DATA.title; document.title = DATA.title;
+  $('introMsg').textContent = '';
+  const saved = store.get();
+  if (saved && saved.done) { showDone(saved.done); return; }
+  if (!DATA.open) { $('introMsg').textContent = '지금은 시험을 볼 수 없어요. 선생님께 여쭤 보세요.'; return; }
+  $('startBtn').disabled = false;
+  if (saved && saved.num) { $('num').value = saved.num; $('name').value = saved.name || ''; }
+}).catch(() => { $('introMsg').textContent = '시험지를 불러오지 못했어요. 새로고침해 보세요.'; });
+
+$('startBtn').onclick = async () => {
+  const num = $('num').value.replace(/[^0-9]/g, ''), name = $('name').value.trim();
+  if (!num || !name) { $('introMsg').textContent = '번호와 이름을 모두 써 주세요.'; return; }
+  $('startBtn').disabled = true; $('introMsg').textContent = '확인하고 있어요...';
+  try {
+    const r = await post('/api/check', { num, name });
+    $('startBtn').disabled = false;
+    if (!r.ok) { $('introMsg').textContent = r.msg; return; }
+    $('introMsg').textContent = '';
+    me = { num, name };
+    const s = store.get();
+    const keep = s && s.num === num && s.name === name ? s.answers : null;
+    store.set({ num, name, answers: keep || [] });
+    buildExam(keep || []);
+  } catch (e) { $('startBtn').disabled = false; $('introMsg').textContent = '연결이 잠깐 끊겼어요. 다시 눌러 보세요.'; }
+};
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function buildExam(prev) {
+  $('intro').hidden = true; $('exam').hidden = false;
+  $('who').textContent = me.num + '번 ' + me.name;
+  let html = '', last = -1;
+  DATA.q.forEach((q, i) => {
+    if (q.s !== last) { if (last >= 0) html += '</section>'; html += '<section class="card"><h2>' + esc(DATA.sec[q.s]) + '</h2>'; last = q.s; }
+    let ins = '';
+    for (let k = 0; k < q.n; k++) {
+      const lab = q.l ? q.l[k] : (q.n > 1 ? '답 ' + (k + 1) : '');
+      const v = prev[i] && prev[i][k] ? prev[i][k] : '';
+      ins += '<div>' + (lab ? '<label class="f" for="a' + i + '_' + k + '">' + esc(lab) + '</label>' : '') +
+        '<input type="text" id="a' + i + '_' + k + '" data-i="' + i + '" data-k="' + k + '" autocomplete="off" spellcheck="false" aria-label="' + (i + 1) + '번 답" value="' + esc(v) + '"></div>';
+    }
+    html += '<div class="item"><div class="qt"><span class="no">' + (i + 1) + '</span><span>' + esc(q.q) + '</span></div><div class="blanks">' + ins + '</div></div>';
+  });
+  $('paper').innerHTML = html + '</section>';
+  $('paper').querySelectorAll('input').forEach(x => x.classList.toggle('filled', !!x.value.trim()));
+  count(); window.scrollTo(0, 0);
+  const first = $('paper').querySelector('input'); if (first) first.focus();
+}
+
+$('paper').addEventListener('input', e => { if (e.target.matches('input')) { e.target.classList.toggle('filled', !!e.target.value.trim()); save(); count(); } });
+$('paper').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || !e.target.matches('input')) return;
+  e.preventDefault();
+  const all = [...$('paper').querySelectorAll('input')], n = all.indexOf(e.target);
+  if (all[n + 1]) all[n + 1].focus();
+});
+
+function collect() {
+  return DATA.q.map((q, i) => Array.from({ length: q.n }, (_, k) => $('a' + i + '_' + k).value));
+}
+function save() { const s = store.get() || {}; s.answers = collect(); store.set(s); }
+function blanks() { return collect().filter(a => a.some(v => !v.trim())).length; }
+function count() {
+  const t = DATA.q.length, f = t - blanks();
+  $('cnt').textContent = f + ' / ' + t + ' 문제 작성';
+  $('barI').style.width = (f / t * 100) + '%';
+}
+
+$('submitBtn').onclick = () => {
+  const b = blanks();
+  $('modalTxt').textContent = b ? '아직 빈칸인 문제가 ' + b + '개 있어요. 제출하면 다시 고칠 수 없어요.' : '모든 문제를 썼어요. 제출하면 다시 고칠 수 없어요.';
+  $('modal').hidden = false; $('backBtn').focus();
+};
+$('backBtn').onclick = () => { $('modal').hidden = true; };
+$('okBtn').onclick = async () => {
+  $('okBtn').disabled = true; $('okBtn').textContent = '보내는 중...';
+  const reset = () => { $('okBtn').disabled = false; $('okBtn').textContent = '제출하기'; $('modal').hidden = true; };
+  try {
+    const r = await post('/api/submit', { num: me.num, name: me.name, answers: collect() });
+    reset();
+    if (!r.ok) { $('examMsg').textContent = r.msg; return; }
+    const d = { name: me.name, num: me.num, show: r.show, score: r.score, right: r.right, total: r.total };
+    store.set({ done: d });
+    showDone(d);
+  } catch (e) {
+    reset();
+    $('examMsg').textContent = '제출이 안 됐어요. 쓴 답은 그대로 있으니 인터넷을 확인하고 다시 눌러 보세요.';
+  }
+};
+
+function showDone(d) {
+  $('intro').hidden = true; $('exam').hidden = true; $('done').hidden = false;
+  const box = $('doneBox');
+  box.innerHTML = '<h2>제출했어요!</h2>';
+  const p = document.createElement('p'); p.style.margin = '0';
+  p.textContent = d.num + '번 ' + d.name + ' 학생, 시험을 보느라 수고했어요.';
+  box.appendChild(p);
+  if (d.show) {
+    const big = document.createElement('div'); big.className = 'big'; big.textContent = d.score + '점';
+    const s = document.createElement('p'); s.style.margin = '0'; s.textContent = d.total + '문제 가운데 ' + d.right + '문제를 맞혔어요.';
+    box.appendChild(big); box.appendChild(s);
+  } else {
+    const s = document.createElement('p'); s.textContent = '채점 결과는 선생님이 알려 줄 거예요.'; box.appendChild(s);
+  }
+  const again = document.createElement('button');
+  again.className = 'btn ghost'; again.style.marginTop = '20px'; again.textContent = '다른 학생이 이 기기로 시험 보기';
+  again.onclick = () => {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    me = null; $('num').value = ''; $('name').value = ''; $('introMsg').textContent = '';
+    $('paper').innerHTML = ''; $('done').hidden = true; $('intro').hidden = false;
+    $('startBtn').disabled = !(DATA && DATA.open); $('num').focus();
+  };
+  box.appendChild(again);
+  window.scrollTo(0, 0);
+}
+}
+</script>
+</body>
+</html>

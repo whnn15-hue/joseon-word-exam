@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>시험 결과 (선생님용)</title>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1ee;--paper:#fff;--ink:#1b2422;--soft:#5d6b67;--line:#d9e0dc;--band:#173b35;--red:#d4372c;--teal:#1d7a6c;--tealbg:#e3f4f0;--redbg:#fdecea;--gold:#e9b949}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Gowun Dodum",system-ui,sans-serif}
+h1,h2,.btn,.num{font-family:"Do Hyeon","Gowun Dodum",sans-serif;font-weight:400}
+header{background:var(--band);color:#fff;padding:16px max(4vw,14px) 54px}
+header h1{margin:0;font-size:clamp(24px,4vw,34px)}
+header p{margin:2px 0 0;opacity:.8;font-size:14px}
+main{max-width:1100px;margin:-38px auto 40px;padding:0 12px}
+.card{background:var(--paper);border-radius:16px;padding:clamp(16px,3vw,26px);box-shadow:0 8px 24px rgba(0,0,0,.1);margin-bottom:14px}
+h2{font-size:21px;margin:0 0 10px;color:var(--teal)}
+input[type=password]{font:inherit;font-size:18px;padding:10px 14px;border:2px solid var(--line);border-radius:12px;min-height:48px;width:min(320px,100%)}
+.btn{border:0;border-radius:10px;padding:9px 16px;font-size:17px;cursor:pointer;min-height:44px;background:var(--teal);color:#fff}
+.btn.ghost{background:none;color:var(--ink);border:2px solid var(--line)}
+.btn.red{background:none;color:var(--red);border:2px solid #f2c2bd}
+.btn.small{font-size:15px;padding:5px 10px;min-height:36px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.msg{color:var(--red);min-height:1.5em;margin:8px 0 0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:var(--tealbg);border-radius:12px;padding:12px 14px}
+.stat span{display:block;font-size:14px;color:var(--soft)}
+.stat .num{font-size:34px;line-height:1.1;color:var(--band)}
+.toggle{display:flex;align-items:center;gap:10px;background:#f6f8f7;border-radius:12px;padding:8px 12px}
+.toggle b{font-weight:400}
+.sw{position:relative;width:52px;height:30px;border-radius:99px;border:0;background:#c5cfcb;cursor:pointer;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
+.sw[aria-checked=true]{background:var(--teal)}.sw[aria-checked=true]::after{left:25px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th,td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:left;vertical-align:top}
+th{font-size:14px;color:var(--soft);font-weight:400;white-space:nowrap}
+td.n{text-align:right;white-space:nowrap}
+.score{font-family:"Do Hyeon";font-size:20px}
+.low{color:var(--red)}
+.detail td{background:#fafcfb}
+.ans{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.ans div{border-radius:8px;padding:6px 10px;font-size:14px;background:var(--tealbg)}
+.ans div.x{background:var(--redbg)}
+.ans small{color:var(--soft)}
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:34px minmax(0,1fr) 120px 52px;gap:10px;align-items:center;font-size:14px}
+.track{height:12px;background:#e5ebe8;border-radius:99px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--teal)}
+.bar.weak .track i{background:var(--red)}
+.bar .a{font-family:"Do Hyeon";font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note{font-size:14px;color:var(--soft)}
+[hidden]{display:none!important}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.bar{grid-template-columns:30px minmax(0,1fr) 46px}.bar .a{display:none}}
+</style>
+</head>
+<body>
+<header><h1>조선 시대 낱말 쓰기 시험 결과</h1><p>선생님만 보는 화면이에요. 이 주소는 학생에게 주지 마세요.</p></header>
+<main>
+<section class="card" id="login">
+<h2>선생님 비밀번호</h2>
+<form id="loginForm" class="row"><input type="password" id="pw" autocomplete="current-password" placeholder="비밀번호"><button class="btn">들어가기</button></form>
+<p class="msg" id="loginMsg"></p>
+</section>
+
+<div id="board" hidden>
+<section class="card">
+<div class="stats" id="stats"></div>
+<div class="row" style="margin-top:14px">
+<div class="toggle"><button class="sw" id="swOpen" role="switch" aria-checked="true" aria-label="시험 열기"></button><b id="lblOpen">시험 열림</b></div>
+<div class="toggle"><button class="sw" id="swShow" role="switch" aria-checked="true" aria-label="학생에게 점수 보여 주기"></button><b>제출 뒤 학생에게 점수 보여 주기</b></div>
+</div>
+<div class="row" style="margin-top:12px">
+<button class="btn" id="refresh">새로고침</button>
+<button class="btn ghost" id="csv">엑셀(CSV) 내려받기</button>
+<button class="btn ghost" id="copy">표 복사</button>
+<button class="btn ghost" id="logout">나가기</button>
+<span class="note" id="updated"></span>
+</div>
+<p class="msg" id="boardMsg"></p>
+</section>
+
+<section class="card">
+<h2>학생별 결과</h2>
+<div class="scroll"><table><thead><tr><th>번호</th><th>이름</th><th>점수</th><th>맞힌 개수</th><th>제출 시각</th><th>틀린 문항</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+<p class="note">'다시 보게 하기'를 누르면 그 학생의 답안이 지워지고, 같은 번호와 이름으로 다시 응시할 수 있어요.</p>
+</section>
+
+<section class="card">
+<h2>문항별 정답률</h2>
+<p class="note" style="margin-top:0">정답률 60% 아래 문항은 빨간색이에요. 다시 짚어 줄 낱말을 고를 때 보세요.</p>
+<div class="bars" id="bars"></div>
+</section>
+</div>
+</main>
+
+<script>
+{
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let pw = '', D = null, open = new Set(), timer = null;
+try { pw = sessionStorage.getItem('jx-pw') || ''; } catch (e) {}
+
+async function admin(body) {
+  const r = await fetch('/api/admin', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.assign({ pw }, body)) });
+  return r.json();
+}
+const fmt = iso => { const d = new Date(iso); return (d.getMonth() + 1) + '. ' + d.getDate() + '. ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+
+async function load() {
+  try {
+    const r = await admin({ action: 'list' });
+    if (!r.ok) { logout(r.msg); return; }
+    D = r; $('login').hidden = true; $('board').hidden = false; $('boardMsg').textContent = '';
+    try { sessionStorage.setItem('jx-pw', pw); } catch (e) {}
+    render();
+    $('updated').textContent = '마지막 확인 ' + fmt(new Date().toISOString());
+    if (!timer) timer = setInterval(() => { if (!document.hidden) load(); }, 20000);
+  } catch (e) { $('boardMsg').textContent = '불러오지 못했어요. 잠시 뒤 새로고침해 보세요.'; $('loginMsg').textContent = '연결에 문제가 있어요.'; }
+}
+function logout(msg) {
+  pw = ''; try { sessionStorage.removeItem('jx-pw'); } catch (e) {}
+  clearInterval(timer); timer = null;
+  $('board').hidden = true; $('login').hidden = false; $('loginMsg').textContent = msg || ''; $('pw').value = ''; $('pw').focus();
+}
+
+function render() {
+  const R = D.results, n = R.length, sc = R.map(r => r.score);
+  const avg = n ? Math.round(sc.reduce((a, b) => a + b, 0) / n) : 0;
+  $('stats').innerHTML = [['응시 인원', n + '명'], ['평균', n ? avg + '점' : '없음'], ['최고', n ? Math.max(...sc) + '점' : '없음'], ['최저', n ? Math.min(...sc) + '점' : '없음']]
+    .map(([a, b]) => '<div class="stat"><span>' + a + '</span><div class="num">' + b + '</div></div>').join('');
+  $('swOpen').setAttribute('aria-checked', D.settings.open); $('lblOpen').textContent = D.settings.open ? '시험 열림' : '시험 닫힘';
+  $('swShow').setAttribute('aria-checked', D.settings.showScore);
+
+  $('rows').innerHTML = n ? R.map(r => {
+    const row = '<tr><td class="n">' + esc(r.num) + '</td><td>' + esc(r.name) + '</td><td class="n score' + (r.score < 60 ? ' low' : '') + '">' + r.score + '</td><td class="n">' + r.right + ' / ' + r.total + '</td><td class="n">' + fmt(r.at) + '</td><td>' + (r.wrong.join(', ') || '없음') + '</td><td class="n"><div class="row" style="justify-content:flex-end"><button class="btn ghost small" data-see="' + esc(r.num) + '">' + (open.has(r.num) ? '답안 접기' : '답안 보기') + '</button><button class="btn red small" data-del="' + esc(r.num) + '">다시 보게 하기</button></div></td></tr>';
+    if (!open.has(r.num)) return row;
+    const cells = D.q.map((q, i) => '<div class="' + (r.marks[i] ? '' : 'x') + '"><b>' + (i + 1) + '. ' + (r.marks[i] ? '○' : '✕') + '</b> ' + esc(r.answers[i].filter(v => v.trim()).join(', ') || '(빈칸)') + (r.marks[i] ? '' : '<br><small>정답: ' + esc(q.ans) + '</small>') + '</div>').join('');
+    return row + '<tr class="detail"><td colspan="7"><div class="ans">' + cells + '</div></td></tr>';
+  }).join('') : '<tr><td colspan="7" class="note">아직 제출한 학생이 없어요. 학생이 제출하면 20초 안에 여기 나타나요.</td></tr>';
+
+  $('bars').innerHTML = D.q.map((q, i) => {
+    const ok = R.filter(r => r.marks[i]).length, p = n ? Math.round(ok / n * 100) : 0;
+    return '<div class="bar' + (n && p < 60 ? ' weak' : '') + '" title="' + esc(q.q) + '"><span>' + (i + 1) + '</span><div class="track"><i style="width:' + p + '%"></i></div><span class="a">' + esc(q.ans) + '</span><span>' + (n ? p + '%' : '-') + '</span></div>';
+  }).join('');
+}
+
+$('loginForm').onsubmit = e => { e.preventDefault(); pw = $('pw').value; $('loginMsg').textContent = '확인하고 있어요...'; load(); };
+$('refresh').onclick = load;
+$('logout').onclick = () => logout('');
+$('rows').onclick = async e => {
+  const see = e.target.closest('[data-see]'), del = e.target.closest('[data-del]');
+  if (see) { const k = see.dataset.see; open.has(k) ? open.delete(k) : open.add(k); render(); }
+  if (del) {
+    const r = D.results.find(x => x.num === del.dataset.del);
+    if (!r || !confirm(r.num + '번 ' + r.name + ' 학생의 답안을 지우고 다시 응시할 수 있게 할까요?')) return;
+    const res = await admin({ action: 'delete', num: r.num });
+    if (!res.ok) { $('boardMsg').textContent = res.msg; return; }
+    load();
+  }
+};
+async function setCfg(key, el) {
+  const val = el.getAttribute('aria-checked') !== 'true';
+  const res = await admin({ action: 'config', [key]: val });
+  if (!res.ok) { $('boardMsg').textContent = res.msg; return; }
+  D.settings = res.settings; render();
+}
+$('swOpen').onclick = () => setCfg('open', $('swOpen'));
+$('swShow').onclick = () => setCfg('showScore', $('swShow'));
+
+function table() {
+  const head = ['번호', '이름', '점수', '맞힌 개수', '제출 시각', '틀린 문항'].concat(D.q.map((q, i) => (i + 1) + '번 ' + q.ans));
+  const body = D.results.map(r => [r.num, r.name, r.score, r.right, new Date(r.at).toLocaleString('ko-KR'), r.wrong.join(' ')]
+    .concat(D.q.map((q, i) => (r.marks[i] ? '○ ' : '✕ ') + (r.answers[i].filter(v => v.trim()).join(' ') || '(빈칸)'))));
+  return [head].concat(body);
+}
+$('csv').onclick = () => {
+  const csv = table().map(row => row.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = '조선시대_낱말쓰기_시험결과.csv'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+$('copy').onclick = async () => {
+  const tsv = table().map(r => r.join('\t')).join('\n');
+  try { await navigator.clipboard.writeText(tsv); $('boardMsg').textContent = '복사했어요. 엑셀이나 구글 시트에 붙여 넣으세요.'; }
+  catch (e) { $('boardMsg').textContent = '복사가 막혔어요. CSV 내려받기를 써 주세요.'; }
+};
+
+if (pw) load(); else $('pw').focus();
+}
+</script>
+</body>
+</html>
