@@ -9,3 +9,8 @@
 ## 설정
 - Netlify 환경 변수 `TEACHER_PASSWORD`: 선생님 화면 비밀번호
 - Netlify 프로젝트의 Visitor access(팀 로그인 보호)는 꺼야 학생이 들어올 수 있음
+
+## 사회 1단원 쪽지시험 (빈칸 65개)
+- `/unit1/` 시험, `/unit1/practice.html` 연습(초성 힌트, 문단마다 두 번 기회), `/unit1/teacher.html` 결과
+- 문제와 정답: `lib/unit1.mjs`, 서버: `netlify/functions/unit1.mts`
+- 선생님 화면에서 시험 열기, 점수 공개, 연습하기 열기를 켜고 끌 수 있음 (시험 중에는 연습하기를 닫기)

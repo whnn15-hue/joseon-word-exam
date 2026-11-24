@@ -1,0 +1,52 @@
+:root{--bg:#f1efe9;--paper:#fff;--ink:#22201b;--soft:#6a655b;--line:#ddd8cc;--band:#3b2f22;--accent:#a4542b;--accentbg:#f7ece4;--ok:#1d7a5c;--okbg:#e2f3ec;--no:#c0392b;--nobg:#fbe9e7;--gold:#c89a2c}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.75 "Gowun Dodum",system-ui,sans-serif}
+h1,h2,h3,.btn,.no,.chip{font-family:"Do Hyeon","Gowun Dodum",sans-serif;font-weight:400}
+header{background:var(--band);color:#fff;padding:18px max(5vw,16px) 60px}
+header h1{margin:0;font-size:clamp(26px,5vw,38px);line-height:1.15}
+header p{margin:4px 0 0;opacity:.85;font-size:15px}
+main{max-width:860px;margin:-40px auto 40px;padding:0 12px}
+.card{background:var(--paper);border-radius:18px;padding:clamp(18px,4vw,32px);box-shadow:0 10px 30px rgba(0,0,0,.1);margin-bottom:16px}
+h2{font-size:23px;margin:0 0 6px;color:var(--accent)}
+h3{font-size:19px;margin:22px 0 4px;color:var(--band);border-bottom:2px solid var(--line);padding-bottom:4px}
+label.f{display:block;font-size:15px;color:var(--soft);margin:0 0 6px}
+input[type=text]{font:inherit;color:var(--ink);background:#fff}
+.field{width:100%;font-size:19px;padding:11px 14px;border:2px solid var(--line);border-radius:12px;min-height:50px}
+.field:focus,.bl input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accentbg)}
+.grid{display:grid;grid-template-columns:110px 1fr;gap:12px}
+.btn{border:0;border-radius:12px;padding:12px 22px;font-size:20px;cursor:pointer;min-height:50px;background:var(--accent);color:#fff}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn.ghost{background:none;color:var(--ink);border:2px solid var(--line)}
+.btn.small{font-size:16px;padding:6px 14px;min-height:40px}
+.btn.hint{background:#fff7e0;color:#8a6510;border:2px solid var(--gold)}
+.btn:focus-visible,.chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.msg{margin:12px 0 0;color:var(--no);min-height:1.6em}
+.rules{background:var(--accentbg);border-radius:12px;padding:12px 16px;margin:16px 0 0;font-size:15px}
+.rules p{margin:2px 0}
+.item{display:flex;gap:10px;padding:14px 0;border-bottom:1px dashed var(--line)}
+.item:last-child{border-bottom:0}
+.no{flex:none;width:32px;height:32px;border-radius:50%;background:var(--band);color:#fff;display:grid;place-items:center;font-size:16px;margin-top:3px}
+.txt{flex:1}
+.bl{display:inline-flex;align-items:center;gap:3px;margin:3px 2px;vertical-align:middle;white-space:nowrap}
+.bl b{font-family:"Do Hyeon";font-weight:400;font-size:14px;color:#fff;background:var(--accent);border-radius:6px;padding:0 6px;line-height:1.6}
+.bl input{width:8.2em;font-size:17px;padding:4px 8px;border:2px solid var(--line);border-radius:8px;min-height:38px}
+.bl input.filled{border-color:#c9a98f}
+.bl.ok input{border-color:var(--ok);background:var(--okbg);color:var(--ok)}
+.bl.no input{border-color:var(--no);background:var(--nobg)}
+.bl .ans{font-family:"Do Hyeon";font-size:15px;color:var(--no);margin-left:2px}
+.help{margin:8px 0 0;font-size:15px;color:var(--soft);background:#f7f5ef;border-radius:8px;padding:6px 10px}
+.help::before{content:"도움말 ";font-family:"Do Hyeon";color:var(--accent)}
+.sticky{position:sticky;top:0;z-index:5;background:var(--band);color:#fff;padding:10px max(4vw,14px);display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px}
+.sticky b{font-family:"Do Hyeon";font-size:19px;font-weight:400}
+.bar{height:6px;background:rgba(255,255,255,.2)}.bar i{display:block;height:100%;background:var(--gold);transition:width .3s}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:10}
+.modal .card{max-width:440px;width:100%;margin:0}
+.big{font-family:"Do Hyeon";font-size:64px;line-height:1;color:var(--accent);margin:10px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;min-height:42px}
+.chip[aria-pressed=true]{border-color:var(--accent);background:var(--accentbg);color:var(--accent)}
+.itemfb{font-size:15px;margin-top:6px}
+.itemfb.ok{color:var(--ok)}.itemfb.no{color:var(--no)}
+[hidden]{display:none!important}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.btn{flex:1 1 auto}.bl input{width:7em}.item{gap:8px}}
