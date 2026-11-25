@@ -5,7 +5,7 @@ window.Paper = {
   itemHtml(it, k, extra) {
     const body = this.esc(it.t).replace(/\n/g, '<br>').replace(/\{(\d+)\}/g, (_, n) =>
       '<span class="bl" id="bl' + n + '"><b>' + n + '</b><input type="text" id="b' + n + '" data-n="' + n + '" autocomplete="off" spellcheck="false" aria-label="' + n + '번 빈칸"></span>');
-    return '<div class="item" id="it' + k + '"><span class="no">' + (k + 1) + '</span><div class="txt">' + body +
+    return '<div class="item" id="it' + k + '"><span class="qno">' + (k + 1) + '</span><div class="txt">' + body +
       (it.h ? '<p class="help">' + this.esc(it.h) + '</p>' : '') + (extra ? extra(it, k) : '') + '</div></div>';
   },
   render(D, parts, extra) {
