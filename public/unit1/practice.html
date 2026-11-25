@@ -28,7 +28,7 @@ const $ = id => document.getElementById(id);
 const CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
 const cho = s => [...s].map(c => { const k = c.charCodeAt(0) - 0xAC00; return k >= 0 && k < 11172 ? CHO[Math.floor(k / 588)] : c; }).join('');
 const norm = s => String(s || '').replace(/[\s「」『』“”"'.,()\[\]·!?~\-]/g, '').toLowerCase();
-let D = null, A = null, G = [], cur = 0, ok = new Set(), okv = {}, tries = {};
+let D = null, A = null, G = [], cur = 0, ok = new Set(), okv = {}, rev = {}, tries = {};
 
 Promise.all([fetch('/api/unit1/exam', { cache: 'no-store' }).then(r => r.json()), fetch('/api/unit1/practice', { cache: 'no-store' }).then(r => r.json())])
   .then(([d, p]) => {
@@ -49,6 +49,7 @@ function show(p) {
   $('paper').innerHTML = Paper.render(D, parts, extra);
   for (const c of $('parts').children) c.setAttribute('aria-pressed', String(c.dataset.p) === String(p));
   ok.forEach(n => { const x = $('b' + n); if (x) { x.value = okv[n] || A[n - 1].split('|')[0]; x.readOnly = true; $('bl' + n).classList.add('ok'); } });
+  Object.keys(rev).forEach(n => { const x = $('b' + n); if (x) { x.value = rev[n]; x.readOnly = true; $('bl' + n).classList.add('rev'); } });
   count();
 }
 function count() { $('cnt').textContent = ok.size + ' / ' + A.length; }
@@ -75,7 +76,7 @@ $('paper').addEventListener('keydown', e => {
 
 function check(k) {
   const ns = Paper.blanksOf(D.items[k].t);
-  if (ns.every(n => ok.has(n))) return;
+  if (ns.every(n => ok.has(n) || rev[n])) return;
   if (ns.some(n => !ok.has(n) && !$('b' + n).value.trim())) { const fb = $('fb' + k); fb.className = 'itemfb no'; fb.textContent = '빈칸을 모두 채우고 확인을 눌러요.'; return; }
   tries[k] = (tries[k] || 0) + 1;
   const used = new Set(ns.filter(n => ok.has(n) && groupOf(n)).map(n => norm(okv[n])));
@@ -96,22 +97,25 @@ function check(k) {
   if (!left.length) { fb.className = 'itemfb ok'; fb.textContent = tries[k] === 1 ? '모두 맞았어요!' : '두 번째에 모두 맞혔어요!'; }
   else if (tries[k] < 2) { fb.className = 'itemfb no'; fb.textContent = '빨간 빈칸을 다시 생각해 볼까요? 기회가 한 번 더 있어요.'; $('b' + left[0]).select(); }
   else {
-    fb.className = 'itemfb no'; fb.textContent = '정답을 확인하고 다음 문단으로 가요.';
-    const usedNames = new Set(ns.filter(n => ok.has(n)).map(n => norm($('b' + n).value)));
+    const usedNames = new Set(ns.filter(n => ok.has(n)).map(n => norm(okv[n])));
+    const lines = [];
     left.forEach(n => {
-      const g = groupOf(n);
+      const g = groupOf(n), x = $('b' + n);
       let ans = A[n - 1].split('|')[0];
       if (g) { ans = A[n - 1].split('|').find(a => !usedNames.has(norm(a))) || ans; usedNames.add(norm(ans)); }
-      const s = document.createElement('span'); s.className = 'ans'; s.textContent = '→ ' + ans;
-      $('bl' + n).appendChild(s); $('b' + n).readOnly = true;
+      lines.push('<p><b>' + n + '번</b> 정답은 <b>' + Paper.esc(ans) + '</b> (내가 쓴 답: ' + Paper.esc(x.value.trim()) + ')</p>');
+      rev[n] = ans; x.value = ans; x.readOnly = true;
+      $('bl' + n).classList.remove('no'); $('bl' + n).classList.add('rev');
     });
+    fb.className = 'itemfb no';
+    fb.innerHTML = lines.join('') + '<p>정답을 기억하고 다음 문단으로 가요.</p>';
   }
   count();
 }
 
 $('resetBtn').onclick = () => {
   const parts = cur === 'all' ? D.parts.map((_, i) => i) : [cur];
-  D.items.forEach((it, k) => { if (parts.includes(it.p)) { delete tries[k]; Paper.blanksOf(it.t).forEach(n => { ok.delete(n); delete okv[n]; }); } });
+  D.items.forEach((it, k) => { if (parts.includes(it.p)) { delete tries[k]; Paper.blanksOf(it.t).forEach(n => { ok.delete(n); delete okv[n]; delete rev[n]; }); } });
   show(cur); window.scrollTo(0, 0);
 };
 }
